@@ -1,0 +1,13 @@
+[Unit]
+Description=gorush service
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/ubuntu/gorush
+Restart=always
+RestartSec=5s
+ExecStart=/home/ubuntu/gorush/gorush -c gorush-config.yml
+
+[Install]
+WantedBy=multi-user.target

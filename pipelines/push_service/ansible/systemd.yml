@@ -1,0 +1,15 @@
+- hosts: push_server
+  tasks:
+    - name: copy systemd service
+      template:
+        src: gorush.service.j2
+        dest: "/lib/systemd/system/gorush.service"
+      become: yes
+
+    - name: start gorush service 
+      systemd:
+        state: started
+        name: "gorush"
+        daemon_reload: yes
+        enabled: yes
+      become: yes

@@ -1,0 +1,11 @@
+---
+# gorush-config.yml.j2 variable
+ios_key_path: AuthKey_85G8K9ZXKX.p8
+
+# ios, android setting
+ios_auth_key_local_path: /Users/jaeseokpark/work/sshkey/AuthKey_85G8K9ZXKX.p8
+
+# basic enviroment variables
+gorush_home: /home/ubuntu/gorush
+
+

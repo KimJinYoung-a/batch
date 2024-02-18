@@ -1,0 +1,140 @@
+- hosts: deploy_server
+  tasks:
+    - name: install unzip
+      yum:
+        name: "{{ packages }}"
+      vars:
+        packages:
+        - unzip
+
+    - name: Create deployer directory
+      file:
+        path: "/home/10x10-dev/work/deployer"
+        state: directory
+
+    ############################################
+    ## Nomad 설치
+    ############################################
+    - name: Download Nomad
+      get_url:
+        url: https://releases.hashicorp.com/nomad/0.10.2/nomad_0.10.2_linux_amd64.zip
+        dest: "/home/10x10-dev/work/deployer"
+
+    - name: Unzip Nomad
+      unarchive:
+        src: /home/10x10-dev/work/deployer/nomad_0.10.2_linux_amd64.zip
+        dest: /home/10x10-dev/work/deployer
+
+    - name: copy nomad to bin
+      become: yes
+      become_user: root
+      copy:
+        src: /home/10x10-dev/work/deployer/nomad
+        dest: /usr/local/bin
+
+    - name: create data directory for nomad
+      become: yes
+      become_user: root
+      file:
+        path: "/opt/nomad"
+        state: directory
+
+    - name: copy nomad.service file
+      become: yes
+      become_user: root
+      copy:
+        src: /home/10x10-dev/work/deployer/scripts/nomad.service
+        dest: /etc/systemd/system/nomad.service
+
+    - name: create a configuration file
+      become: yes
+      become_user: root
+      file:
+        path: "/etc/nomad.d"
+        state: directory
+
+    - name: copy nomad.hcl file
+      become: yes
+      become_user: root
+      copy:
+        src: /home/10x10-dev/work/deployer/scripts/nomad.hcl
+        dest: /etc/nomad.d/nomad.hcl
+
+    ############################################
+    ## Consul 설치
+    ############################################
+    - name: Download Consul
+      get_url:
+        url: https://releases.hashicorp.com/consul/1.6.2/consul_1.6.2_linux_amd64.zip
+        dest: "/home/10x10-dev/work/deployer"
+
+    - name: Unzip Consul
+      unarchive:
+        src: /home/10x10-dev/work/deployer/consul_1.6.2_linux_amd64.zip
+        dest: /home/10x10-dev/work/deployer
+
+    - name: copy consul to bin
+      become: yes
+      become_user: root
+      copy:
+        src: /home/10x10-dev/work/deployer/consul
+        dest: /usr/local/bin/
+
+    - name: create consul user
+      become: yes
+      become_user: root
+      command: useradd --system --home /etc/consul.d --shell /bin/false consul
+      ignore_errors: yes
+
+    - name: create a consul data directory
+      become: yes
+      become_user: root
+      file:
+        path: /opt/consul
+        state: directory
+
+    - name: Recursively change ownership of consul data directory
+      become: yes
+      become_user: root
+      file:
+        path: /opt/consul
+        state: directory
+        recurse: yes
+        owner: consul
+        group: consul
+
+    - name: copy consul.service file
+      become: yes
+      become_user: root
+      copy:
+        src: /home/10x10-dev/work/deployer/scripts/consul.service
+        dest: /etc/systemd/system/consul.service
+
+    - name: create a consul configuration file
+      become: yes
+      become_user: root
+      file:
+        path: "/etc/consul.d"
+        state: directory
+
+    - name: copy consul.hcl file
+      become: yes
+      become_user: root
+      copy:
+        src: /home/10x10-dev/work/deployer/scripts/consul.hcl
+        dest: /etc/consul.d/consul.hcl
+
+    - name: Recursively change ownership of consul data directory
+      become: yes
+      become_user: root
+      file:
+        path: /etc/consul.d
+        state: directory
+        recurse: yes
+        owner: consul
+        group: consul
+
+
+
+
+

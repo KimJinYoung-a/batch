@@ -1,0 +1,9 @@
+- hosts: push_server
+  tasks:
+    - name: restart gorush service
+      systemd:
+        state: restarted
+        name: "gorush"
+        daemon_reload: yes
+        enabled: yes
+      become: yes

@@ -1,0 +1,33 @@
+- hosts: push_server
+  vars_files:
+    - var.yml
+  tasks:
+    - name: Create gorush directory
+      file:
+        path: "{{ gorush_home }}"
+        state: directory
+        
+    - name: Download gorush
+      get_url:
+        url: https://github.com/appleboy/gorush/releases/download/v1.11.2/gorush-v1.11.2-linux-amd64
+        dest: "{{ gorush_home }}/gorush" 
+        mode: 'u+x'
+        
+    - name: Create log directory
+      file:
+        path: "{{ gorush_home }}/log"
+        state: directory
+        
+    - name: copy gorush config file
+      template:
+        src: gorush-config.yml.j2
+        dest: "{{ gorush_home }}/gorush-config.yml"
+        
+    - name: copy ios authkey
+      copy:
+        src: "{{ios_auth_key_local_path}}"
+        dest: "{{ gorush_home }}/AuthKey_85G8K9ZXKX.p8"
+        
+    - name: set timezone
+      shell: timedatectl set-timezone Asia/Seoul
+      become: yes

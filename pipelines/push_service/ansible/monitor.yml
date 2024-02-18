@@ -1,0 +1,36 @@
+- hosts: push_server
+  tasks:
+    - name: disk volume
+      shell: df -h | grep nvme
+      register: v1
+      
+    - name: log volume
+      shell: journalctl -u gorush.service --disk-usage
+      register: v2
+      
+    - name: gorush service status
+      shell: systemctl status gorush | grep Active
+      register: v3
+      
+    - name: uptime
+      shell: uptime
+      register: v4
+
+    - name: report to jandi
+      uri:
+        url: https://wh.jandi.com/connect-api/webhook/15400820/e22a7280497b36b0472934b78bdd1b6e
+        method: POST
+        headers:
+          Accept: application/vnd.tosslab.jandi-v2+json
+          Content-Type: application/json
+        body_format: json
+        body: 
+          body: "{{inventory_hostname}}\n{{ v1.stdout }}\n{{ v2.stdout }}\n{{ v3.stdout | trim }}\n{{ v4.stdout | trim }}"
+
+    - debug:
+        msg:
+        - "{{inventory_hostname}}"
+        - "{{ v1.stdout }}"
+        - "{{ v2.stdout }}"
+        - "{{ v3.stdout }}"
+        - "{{ v4.stdout }}"
